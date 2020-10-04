@@ -1,0 +1,11 @@
+CountryApplication/bin
+CountryApplication/obj
+CountryApplication/.vs
+
+CountryApi/bin
+CountryApi/obj
+CountryApi/.vs
+CountryApi/CountryApi.csproj.user
+CountryApi/appsettings.Development.json
+
+.idea
