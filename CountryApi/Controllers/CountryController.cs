@@ -19,9 +19,9 @@ namespace CountryApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CreateCountryDto createCountryDto)
+        public async Task<IActionResult> Create(string name, string code)
         {
-            var result = await _countryService.CreateAsync(createCountryDto);
+            var result = await _countryService.CreateAsync(new CreateCountryDto(name, code));
 
             if (result.IsFailed &&
                 (result.Errors.Exists(e => e.HasMetadata("errCode", "errCountryAlreadyExistsByName")) ||
