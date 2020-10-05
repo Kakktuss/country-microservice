@@ -17,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Prometheus;
+using Serilog;
 using STAN.Client;
 
 namespace CountryApi
@@ -192,6 +193,9 @@ namespace CountryApi
             app.UseHttpMetrics();
             
             ConfigureMetrics(app);
+
+            // Configure serilog to log requests
+            app.UseSerilogRequestLogging();
 
             // Configure endpoints
             app.UseEndpoints(endpoints =>
