@@ -5,12 +5,15 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Extensions.Logging;
 using Serilog.Sinks.Loki;
 
 namespace CountryApi
 {
     public class Program
     {
+        private static readonly LoggerProviderCollection _providers = new LoggerProviderCollection();
+
         public static void Main(string[] args)
         {
             
@@ -22,8 +25,9 @@ namespace CountryApi
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+                .UseSerilog(providers: _providers)
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory());
         }
         
         public static void ConfigureLogging()
