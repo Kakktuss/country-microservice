@@ -19,7 +19,7 @@ namespace CountryApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(string name, string code)
+        public async Task<IActionResult> Create([FromForm] string name, [FromForm] string code)
         {
             var result = await _countryService.CreateAsync(new CreateCountryDto(name, code));
 
