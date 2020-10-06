@@ -26,7 +26,7 @@ namespace CountryApi
         {
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
-                .UseSerilog(providers: _providers)
+                .UseSerilog()
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory());
         }
         
@@ -46,6 +46,7 @@ namespace CountryApi
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
+                .MinimumLevel.Verbose()
                 .WriteTo.Debug()
                 .WriteTo.Console()
                 .WriteTo.LokiHttp(lokiCredentials)
