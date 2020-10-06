@@ -54,24 +54,13 @@ namespace CountryApplication.Services
             var country = new Country(createCountryDto.Name, createCountryDto.Code);
 
             _countryRepository.Add(country);
+            
+            var result = await _countryRepository.UnitOfWork.SaveEntitiesAsync();
 
-            try
+            if (!result)
             {
-                var result = await _countryRepository.UnitOfWork.SaveEntitiesAsync();
-
-                if (!result)
-                {
-                    _logger.LogInformation(
-                        "[CountryService:CreateAsync] Error: An error happened while trying to save the country");
-
-                    return Results.Fail(new Error("An error happened while trying to save the country")
-                        .WithMetadata("errCode", "errDbSaveFail"));
-                }
-            }
-            catch (DbUpdateException e)
-            {
-                _logger.LogError(
-                    "[CountryService:CreateAsync] Error: An error happened while trying to save the country", e);
+                _logger.LogInformation(
+                    "[CountryService:CreateAsync] Error: An error happened while trying to save the country");
 
                 return Results.Fail(new Error("An error happened while trying to save the country")
                     .WithMetadata("errCode", "errDbSaveFail"));
