@@ -22,8 +22,8 @@ namespace CountryApplication.DapperDataAccess.Repositories
             using (var connection = new SqlConnection(_connectionString))
             {
                 var result = await connection.QueryAsync<CountryViewModel>(
-                    @"SELECT c.[Uuid] as Uuid
-                                c.[Name] as Name
+                    @"SELECT c.[Uuid] as Uuid,
+                                c.[Name] as Name,
                                 c.[Code] as Code
                            FROM [dbo].[Countries] c");
 
@@ -40,8 +40,8 @@ namespace CountryApplication.DapperDataAccess.Repositories
                 dynamicParameters.Add("@Uuid", uuid);
                 
                 var result = await connection.QueryFirstAsync<CountryViewModel>(
-                    @"SELECT c.[Uuid] as Uuid
-                                c.[Name] as Name
+                    @"SELECT c.[Uuid] as Uuid,
+                                c.[Name] as Name,
                                 c.[Code] as Code
                            FROM [dbo].[Countries] c
                            WHERE c.Uuid = @Uuid",

@@ -153,7 +153,7 @@ namespace CountryApi
 
         public virtual void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterModule(new RepositoryAutofacModule());
+            builder.RegisterModule(new RepositoryAutofacModule(Configuration.GetConnectionString("DefaultConnectionString")));
 
             builder.RegisterModule(new ServiceAutofacModule());
 
