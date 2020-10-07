@@ -117,6 +117,7 @@ namespace CountryApi
 
             services.AddHealthChecks();
 
+            services.AddSystemMetrics(false);
             services.AddSystemMetricCollector<CpuUsageCollector>();
             services.AddSystemMetricCollector<MemoryCollector>();
             services.AddSystemMetricCollector<NetworkCollector>();
@@ -140,7 +141,13 @@ namespace CountryApi
             });
 
             IDisposable collector = DotNetRuntimeStatsBuilder
-                .Default()
+                .Customize()
+                .WithContentionStats()
+                .WithJitStats()
+                .WithThreadPoolSchedulingStats()
+                .WithThreadPoolStats()
+                .WithGcStats()
+                .WithExceptionStats()
                 .StartCollecting();
         }
 
