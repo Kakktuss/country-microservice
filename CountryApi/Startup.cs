@@ -19,6 +19,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Prometheus;
+using Prometheus.DotNetRuntime;
+using Prometheus.SystemMetrics;
+using Prometheus.SystemMetrics.Collectors;
 using Serilog;
 using STAN.Client;
 
@@ -114,6 +117,11 @@ namespace CountryApi
 
             services.AddHealthChecks();
 
+            services.AddSystemMetricCollector<CpuUsageCollector>();
+            services.AddSystemMetricCollector<MemoryCollector>();
+            services.AddSystemMetricCollector<NetworkCollector>();
+            services.AddSystemMetricCollector<LoadAverageCollector>();
+
             services.AddControllers();
         }
 
@@ -130,6 +138,10 @@ namespace CountryApi
 
                 return next();
             });
+
+            IDisposable collector = DotNetRuntimeStatsBuilder
+                .Default()
+                .StartCollecting();
         }
 
         public virtual void ConfigureContainer(ContainerBuilder builder)

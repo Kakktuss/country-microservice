@@ -12,11 +12,8 @@ namespace CountryApi
 {
     public class Program
     {
-        private static readonly LoggerProviderCollection _providers = new LoggerProviderCollection();
-
         public static void Main(string[] args)
         {
-            
             ConfigureLogging();
             
             CreateHostBuilder(args).Build().Run();

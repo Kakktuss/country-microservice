@@ -18,6 +18,18 @@ namespace CountryApi.Controllers
             _countryService = countryService;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            return Ok();
+        }
+
+        [HttpGet("{countryUuid}")]
+        public async Task<IActionResult> Get(Guid countryUuid)
+        {
+            return Ok();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] string name, [FromForm] string code)
         {
