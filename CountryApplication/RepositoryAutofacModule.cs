@@ -7,10 +7,14 @@ namespace CountryApplication
     {
         protected override void Load(ContainerBuilder builder)
         {
-            // builder.RegisterType<CountryRe>()
-
+            // EF Core Configuration
             builder.RegisterType<CountryRepository>()
                 .As<ICountryRepository>()
+                .AsSelf();
+
+            // Dapper Configuration
+            builder.RegisterType<DapperDataAccess.Repositories.CountryRepository>()
+                .As<DapperDataAccess.Repositories.ICountryRepository>()
                 .AsSelf();
         }
     }
