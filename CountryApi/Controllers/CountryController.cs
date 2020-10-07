@@ -21,13 +21,25 @@ namespace CountryApi.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return Ok();
+            var result = await _countryService.RetrieveAsync();
+
+            if (result.IsFailed &&
+                result.Errors.Exists(e => e.HasMetadata("errCode", "errCountriesNotFound")))
+                return NotFound();
+
+            return Ok(result.ValueOrDefault);
         }
 
         [HttpGet("{countryUuid}")]
         public async Task<IActionResult> Get(Guid countryUuid)
         {
-            return Ok();
+            var result = await _countryService.RetrieveByUuidAsync(countryUuid);
+
+            if (result.IsFailed &&
+                result.Errors.Exists(e => e.HasMetadata("errCode", "errCountryNotFound")))
+                return NotFound();
+
+            return Ok(result.ValueOrDefault);
         }
 
         [HttpPost]
