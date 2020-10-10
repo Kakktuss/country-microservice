@@ -59,7 +59,14 @@ namespace CountryApi
 
             services.AddDbContext<CountryContext>((serviceProvider, optionsBuilder) =>
             {
-                optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"));
+                optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"),
+                    sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            10,
+                            TimeSpan.FromSeconds(30),
+                            null);
+                    });
 
                 optionsBuilder.UseInternalServiceProvider(serviceProvider);
             });
