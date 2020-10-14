@@ -23,18 +23,18 @@ namespace CountryApplication.Services
 
         private readonly ILogger<CountryService> _logger;
 
-        private readonly INatsIntegrationEventBus _natsIntegrationEventBus;
+        private readonly IStanIntegrationEventBus _stanIntegrationEventBus;
 
         public CountryService(ICountryRepository countryRepository,
             DapperDataAccess.Repositories.ICountryRepository dapperCountryRepository,
-            INatsIntegrationEventBus natsIntegrationEventBus,
+            IStanIntegrationEventBus stanIntegrationEventBus,
             ILogger<CountryService> logger)
         {
             _countryRepository = countryRepository;
 
             _dapperCountryRepository = dapperCountryRepository;
             
-            _natsIntegrationEventBus = natsIntegrationEventBus;
+            _stanIntegrationEventBus = stanIntegrationEventBus;
 
             _logger = logger;
         }
@@ -110,7 +110,7 @@ namespace CountryApplication.Services
 
             var subject = "country";
 
-            _natsIntegrationEventBus.Publish(subject, "created",
+            _stanIntegrationEventBus.Publish(subject, "created",
                 new CountryCreatedIntegrationEvent(country.Uuid, country.Name, country.Code));
 
             return Results.Ok();
@@ -155,7 +155,7 @@ namespace CountryApplication.Services
 
             var subject = "country";
 
-            _natsIntegrationEventBus.Publish(subject, "deleted", new CountryDeletedIntegrationEvent(country.Uuid));
+            _stanIntegrationEventBus.Publish(subject, "deleted", new CountryDeletedIntegrationEvent(country.Uuid));
 
             return Results.Ok();
         }

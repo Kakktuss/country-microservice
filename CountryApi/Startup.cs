@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Autofac;
-using BuildingBlock.Bus.Nats;
+using BuildingBlock.Bus.Stan;
 using CountryApplication;
 using CountryApplication.EntityFrameworkDataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -115,6 +115,19 @@ namespace CountryApi
                         .AllowCredentials()
                         .AllowAnyHeader();
                 });
+                
+                options.AddPolicy("preProdPolicy", builder =>
+                {
+                    builder.WithOrigins("http://localhost:4200")
+                        .AllowAnyMethod()
+                        .AllowCredentials()
+                        .AllowAnyHeader();
+                    
+                    builder.WithOrigins("https://seo-reborn.com")
+                        .WithMethods("GET", "DELETE", "POST")
+                        .AllowCredentials()
+                        .AllowAnyHeader();
+                });
             });
 
             services.AddApiVersioning(options =>
@@ -175,7 +188,7 @@ namespace CountryApi
 
             appName = $"{appName}_{Guid.NewGuid()}";
             
-            builder.RegisterModule(new NatsBusesAutofacModule(Configuration
+            builder.RegisterModule(new StanBusesAutofacModule(Configuration
                     .GetSection("Bus")
                     .GetSection("Nats")["ClusterName"], 
                 appName, 
@@ -185,12 +198,10 @@ namespace CountryApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var corsPolicy = "prodPolicy";
+            var corsPolicy = Configuration.GetSection("Http")["Cors"];
 
             if (env.IsDevelopment())
             {
-                corsPolicy = "developerPolicy";
-
                 app.UseDeveloperExceptionPage();
                 
                 app.UseSwagger();
