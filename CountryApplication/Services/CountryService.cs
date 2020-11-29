@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BuildingBlock.Bus.Abstractions.Nats.Events;
+using BuildingBlock.Bus.Abstractions.Stan.Events;
 using CountryApplication.Dtos.Request;
 using CountryApplication.EntityFrameworkDataAccess.Repositories;
 using CountryApplication.IntegrationEvents.Events;
@@ -33,7 +32,7 @@ namespace CountryApplication.Services
             _countryRepository = countryRepository;
 
             _dapperCountryRepository = dapperCountryRepository;
-            
+
             _stanIntegrationEventBus = stanIntegrationEventBus;
 
             _logger = logger;
@@ -46,31 +45,30 @@ namespace CountryApplication.Services
             var countries = await _dapperCountryRepository.GetCountriesAsync();
 
             if (!countries.Any())
-            {
-                return Results.Fail(new Error("There is no country found")
+                return Result.Fail(new Error("There is no country found")
                     .WithMetadata("errCode", "errCountriesNotFound"));
-            }
-            
-            return Results.Ok(countries);
+
+            _logger.LogTrace("[CountryService:RetrieveAsync] Command processed successfully");
+
+
+            return Result.Ok(countries);
         }
 
         public async Task<Result<CountryViewModel>> RetrieveByUuidAsync(Guid uuid)
         {
-            
-            _logger.LogTrace("[CountryService:RetrieveAsync] Starting processing the command");
+            _logger.LogTrace("[CountryService:RetrieveByUuidAsync] Starting processing the command");
 
             var country = await _dapperCountryRepository.FindCountryByUuidAsync(uuid);
 
             if (country == null)
-            {
-                return Results.Fail(new Error($"There is no country with uuid {uuid} found")
+                return Result.Fail(new Error($"There is no country with uuid {uuid} found")
                     .WithMetadata("errCode", "errCountryNotFound"));
-            }
-            
-            return Results.Ok(country);
-            
+
+            _logger.LogTrace("[CountryService:RetrieveByUuidAsync] Command processed successfully");
+
+            return Result.Ok(country);
         }
-        
+
         public async Task<Result> CreateAsync(CreateCountryDto createCountryDto)
         {
             _logger.LogTrace("[CountryService:CreateAsync] Starting processing the command");
@@ -80,7 +78,7 @@ namespace CountryApplication.Services
                 _logger.LogInformation(
                     $"[CountryService:CreateAsync] Error: The country with name {createCountryDto.Name} already exists");
 
-                return Results.Fail(new Error($"The country with name {createCountryDto.Name} already exists")
+                return Result.Fail(new Error($"The country with name {createCountryDto.Name} already exists")
                     .WithMetadata("errCode", "errCountryAlreadyExistsByName"));
             }
 
@@ -89,22 +87,22 @@ namespace CountryApplication.Services
                 _logger.LogInformation(
                     $"[CountryService:CreateAsync] Error: The country with name {createCountryDto.Name} already exists");
 
-                return Results.Fail(new Error($"The country with code {createCountryDto.Code} already exists")
+                return Result.Fail(new Error($"The country with code {createCountryDto.Code} already exists")
                     .WithMetadata("errCode", "errCountryAlreadyExistsByCode"));
             }
 
             var country = new Country(createCountryDto.Name, createCountryDto.Code);
 
             _countryRepository.Add(country);
-            
+
             var result = await _countryRepository.UnitOfWork.SaveEntitiesAsync();
 
             if (!result)
             {
                 _logger.LogInformation(
-                    "[CountryService:CreateAsync] Error: An error happened while trying to save the country");
+                    "[CountryService:CreateAsync] Error: An error happened while trying to create the country");
 
-                return Results.Fail(new Error("An error happened while trying to save the country")
+                return Result.Fail(new Error("An error happened while trying to create the country")
                     .WithMetadata("errCode", "errDbSaveFail"));
             }
 
@@ -113,7 +111,7 @@ namespace CountryApplication.Services
             _stanIntegrationEventBus.Publish(subject, "created",
                 new CountryCreatedIntegrationEvent(country.Uuid, country.Name, country.Code));
 
-            return Results.Ok();
+            return Result.Ok();
         }
 
         public async Task<Result> DeleteAsync(DeleteCountryDto deleteCountryDto)
@@ -121,13 +119,13 @@ namespace CountryApplication.Services
             _logger.LogTrace("[CountryService:RemoveAsync] Starting processing the command");
 
             if (!await _countryRepository.ExistsByUuidAsync(deleteCountryDto.Uuid))
-                return Results.Fail(new Error($"The country with uuid {deleteCountryDto.Uuid} does not exists")
+                return Result.Fail(new Error($"The country with uuid {deleteCountryDto.Uuid} does not exists")
                     .WithMetadata("errCode", "errCountryNotFound"));
 
             var country = await _countryRepository.FindByUuidAsync(deleteCountryDto.Uuid);
 
             if (country == null)
-                return Results.Fail(new Error(""));
+                return Result.Fail(new Error(""));
 
             _countryRepository.Remove(country);
 
@@ -140,7 +138,7 @@ namespace CountryApplication.Services
                     _logger.LogInformation(
                         "[CountryService:CreateAsync] Error: An error happened while trying to remove the country");
 
-                    return Results.Fail(new Error("An error happened while trying to remove the country")
+                    return Result.Fail(new Error("An error happened while trying to remove the country")
                         .WithMetadata("errCode", "errDbSaveFail"));
                 }
             }
@@ -149,7 +147,7 @@ namespace CountryApplication.Services
                 _logger.LogError(
                     "[CountryService:CreateAsync] Error: An error happened while trying to remove the country", e);
 
-                return Results.Fail(new Error("An error happened while trying to save the country")
+                return Result.Fail(new Error("An error happened while trying to save the country")
                     .WithMetadata("errCode", "errDbSaveFail"));
             }
 
@@ -157,7 +155,7 @@ namespace CountryApplication.Services
 
             _stanIntegrationEventBus.Publish(subject, "deleted", new CountryDeletedIntegrationEvent(country.Uuid));
 
-            return Results.Ok();
+            return Result.Ok();
         }
     }
 }

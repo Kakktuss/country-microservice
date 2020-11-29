@@ -16,7 +16,7 @@ namespace CountryApplication.EntityFrameworkDataAccess
 
         public DbSet<Country> Countries { get; set; }
 
-        public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = new CancellationToken())
+        public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = new())
         {
             var result = await SaveChangesAsync(cancellationToken);
 

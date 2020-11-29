@@ -10,7 +10,7 @@ namespace CountryApplication.EntityFrameworkDataAccess.Configurations
         public void Configure(EntityTypeBuilder<Country> builder)
         {
             builder.ToTable("Countries");
-            
+
             // Tell efcore to delegate the generation of the id to the database
             builder.Property(e => e.Id)
                 .UseIdentityColumn()
@@ -26,7 +26,7 @@ namespace CountryApplication.EntityFrameworkDataAccess.Configurations
             builder.HasIndex(e => e.Name)
                 .HasName("UIX_Countries_Name")
                 .IsUnique();
-            
+
             // Setup the index UIX_Countries_Code on the Uuid
             builder.HasIndex(e => e.Code)
                 .HasName("UIX_Countries_Code")

@@ -7,12 +7,12 @@ namespace CountryApplication
     public class RepositoryAutofacModule : Module
     {
         private readonly string _connectionString;
-        
+
         public RepositoryAutofacModule(string connectionString)
         {
             _connectionString = connectionString;
         }
-        
+
         protected override void Load(ContainerBuilder builder)
         {
             // EF Core Configuration

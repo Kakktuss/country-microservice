@@ -38,7 +38,7 @@ namespace CountryApplication.DapperDataAccess.Repositories
                 var dynamicParameters = new DynamicParameters();
 
                 dynamicParameters.Add("@Uuid", uuid);
-                
+
                 var result = await connection.QueryFirstAsync<CountryViewModel>(
                     @"SELECT c.[Uuid] as Uuid,
                                 c.[Name] as Name,
