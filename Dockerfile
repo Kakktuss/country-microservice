@@ -1,21 +1,22 @@
-﻿FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-
-ARG nuget_pat
 
 COPY CountryApplication CountryApplication
 COPY CountryApi CountryApi
 
+ARG ACCESS_TOKEN
+ARG ARTIFACTS_ENDPOINT
+
 RUN wget -qO- https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh | bash
 
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
-ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS '{"endpointCredentials":[{"endpoint":"https://pkgs.dev.azure.com/EcomLabLLC/_packaging/EcomLabLLC/nuget/v3/index.json","password":"'${nuget_pat}'"}]}'
+ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS "{\"endpointCredentials\": [{\"endpoint\":\"${ARTIFACTS_ENDPOINT}\", \"password\":\"${ACCESS_TOKEN}\"}]}"
 
-RUN dotnet restore -s "https://pkgs.dev.azure.com/EcomLabLLC/_packaging/EcomLabLLC/nuget/v3/index.json" -s "https://api.nuget.org/v3/index.json" "CountryApi/CountryApi.csproj"
+RUN dotnet restore -s ${ARTIFACTS_ENDPOINT} -s "https://api.nuget.org/v3/index.json" "CountryApi/CountryApi.csproj"
 
 FROM build AS publish
 RUN ls
