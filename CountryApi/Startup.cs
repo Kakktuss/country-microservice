@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using Autofac;
 using BuildingBlock.Bus.Stan;
 using CountryApplication;
@@ -15,7 +14,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Prometheus;
@@ -37,14 +35,13 @@ namespace CountryApi
         }
 
         public IConfiguration Configuration { get; }
-        
+
         public IWebHostEnvironment WebHostEnvironment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public virtual void ConfigureServices(IServiceCollection services)
         {
             if (WebHostEnvironment.IsDevelopment())
-            {
                 services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v2", new OpenApiInfo {Title = "Country api", Version = "v1"});
@@ -53,8 +50,7 @@ namespace CountryApi
                     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                     c.IncludeXmlComments(xmlPath);
                 });
-            }
-            
+
             services.AddEntityFrameworkSqlServer();
 
             services.AddDbContext<CountryContext>((serviceProvider, optionsBuilder) =>
@@ -80,14 +76,9 @@ namespace CountryApi
             {
                 options.Authority = Configuration.GetSection("ThirdParty").GetSection("Auth0")["TenantName"];
                 options.Audience = Configuration.GetSection("ThirdParty").GetSection("Auth0")["Audience"];
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(Configuration.GetSection("ThirdParty").GetSection("Auth0")["Secret"]))
-                };
                 options.RequireHttpsMetadata = false;
             });
-            
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Shopify store authentication api", Version = "v1"});
@@ -96,8 +87,7 @@ namespace CountryApi
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
-            
-            
+
             services.AddCors(options =>
             {
                 options.AddPolicy("developerPolicy", builder =>
@@ -107,7 +97,7 @@ namespace CountryApi
                         .AllowCredentials()
                         .AllowAnyHeader();
                 });
-                
+
                 options.AddPolicy("prodPolicy", builder =>
                 {
                     builder.WithOrigins("https://seo-reborn.com")
@@ -115,14 +105,14 @@ namespace CountryApi
                         .AllowCredentials()
                         .AllowAnyHeader();
                 });
-                
+
                 options.AddPolicy("preProdPolicy", builder =>
                 {
                     builder.WithOrigins("http://localhost:4200")
                         .AllowAnyMethod()
                         .AllowCredentials()
                         .AllowAnyHeader();
-                    
+
                     builder.WithOrigins("https://seo-reborn.com")
                         .WithMethods("GET", "DELETE", "POST")
                         .AllowCredentials()
@@ -130,10 +120,7 @@ namespace CountryApi
                 });
             });
 
-            services.AddApiVersioning(options =>
-            {
-                options.ReportApiVersions = true;
-            });
+            services.AddApiVersioning(options => { options.ReportApiVersions = true; });
 
             services.AddHealthChecks();
 
@@ -148,10 +135,11 @@ namespace CountryApi
 
         public virtual void ConfigureMetrics(IApplicationBuilder app)
         {
-            var callsCounter = Metrics.CreateCounter("request_total", "Counts the requests to the Country API endpoints", new CounterConfiguration()
-            {
-                LabelNames = new[] { "method", "endpoint" }
-            });
+            var callsCounter = Metrics.CreateCounter("request_total",
+                "Counts the requests to the Country API endpoints", new CounterConfiguration()
+                {
+                    LabelNames = new[] {"method", "endpoint"}
+                });
 
             app.Use((context, next) =>
             {
@@ -160,7 +148,7 @@ namespace CountryApi
                 return next();
             });
 
-            IDisposable collector = DotNetRuntimeStatsBuilder
+            var collector = DotNetRuntimeStatsBuilder
                 .Customize()
                 .WithContentionStats()
                 .WithJitStats()
@@ -173,7 +161,8 @@ namespace CountryApi
 
         public virtual void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterModule(new RepositoryAutofacModule(Configuration.GetConnectionString("DefaultConnectionString")));
+            builder.RegisterModule(
+                new RepositoryAutofacModule(Configuration.GetConnectionString("DefaultConnectionString")));
 
             builder.RegisterModule(new ServiceAutofacModule());
 
@@ -187,11 +176,11 @@ namespace CountryApi
                 .GetSection("Nats")["AppName"];
 
             appName = $"{appName}_{Guid.NewGuid()}";
-            
+
             builder.RegisterModule(new StanBusesAutofacModule(Configuration
                     .GetSection("Bus")
-                    .GetSection("Nats")["ClusterName"], 
-                appName, 
+                    .GetSection("Nats")["ClusterName"],
+                appName,
                 options));
         }
 
@@ -203,7 +192,7 @@ namespace CountryApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                
+
                 app.UseSwagger();
 
                 app.UseSwaggerUI(c =>
@@ -214,20 +203,20 @@ namespace CountryApi
 
             // Configure CORS
             app.UseCors(corsPolicy);
-            
+
             app.UseExceptionHandler(a => a.Run(async context =>
             {
                 var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
                 var exception = exceptionHandlerPathFeature.Error;
-    
-                var result = JsonConvert.SerializeObject(new { error = exception.Message });
+
+                var result = JsonConvert.SerializeObject(new {error = exception.Message});
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsync(result);
             }));
-            
+
             // Configure Routing
             app.UseRouting();
-            
+
             // Configure Authentication and Authorization
             app.UseAuthentication();
 
@@ -240,7 +229,7 @@ namespace CountryApi
             app.UseMetricServer();
 
             app.UseHttpMetrics();
-            
+
             ConfigureMetrics(app);
 
             // Configure serilog to log requests

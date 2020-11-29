@@ -24,7 +24,7 @@ namespace CountryApi.Controllers
             var result = await _countryService.RetrieveAsync();
 
             if (result.IsFailed &&
-                result.Errors.Exists(e => e.HasMetadata("errCode", "errCountriesNotFound")))
+                result.Errors.Exists(e => e.HasMetadata("errCode", e => (string) e == "errCountriesNotFound")))
                 return NotFound();
 
             return Ok(result.ValueOrDefault);
@@ -36,7 +36,7 @@ namespace CountryApi.Controllers
             var result = await _countryService.RetrieveByUuidAsync(countryUuid);
 
             if (result.IsFailed &&
-                result.Errors.Exists(e => e.HasMetadata("errCode", "errCountryNotFound")))
+                result.Errors.Exists(e => e.HasMetadata("errCode", e => (string) e == "errCountryNotFound")))
                 return NotFound();
 
             return Ok(result.ValueOrDefault);
@@ -48,11 +48,14 @@ namespace CountryApi.Controllers
             var result = await _countryService.CreateAsync(new CreateCountryDto(name, code));
 
             if (result.IsFailed &&
-                (result.Errors.Exists(e => e.HasMetadata("errCode", "errCountryAlreadyExistsByName")) ||
-                 result.Errors.Exists(e => e.HasMetadata("errCode", "errCountryAlreadyExistsByName"))))
+                (result.Errors.Exists(e =>
+                     e.HasMetadata("errCode", e => (string) e == "errCountryAlreadyExistsByName")) ||
+                 result.Errors.Exists(e =>
+                     e.HasMetadata("errCode", e => (string) e == "errCountryAlreadyExistsByName"))))
                 return Conflict("The country already exists");
 
-            if (result.IsFailed && result.Errors.Exists(e => e.HasMetadata("errCode", "errDbSaveFail")))
+            if (result.IsFailed &&
+                result.Errors.Exists(e => e.HasMetadata("errCode", e => (string) e == "errDbSaveFail")))
                 return BadRequest("An error happened while trying to save the country into the database");
 
             return Ok();
@@ -63,7 +66,8 @@ namespace CountryApi.Controllers
         {
             var result = await _countryService.DeleteAsync(new DeleteCountryDto(countryUuid));
 
-            if (result.IsFailed && result.Errors.Exists(e => e.HasMetadata("errCode", "errCountryNotFound")))
+            if (result.IsFailed &&
+                result.Errors.Exists(e => e.HasMetadata("errCode", e => (string) e == "errCountryNotFound")))
                 return NotFound();
 
             return Ok();
