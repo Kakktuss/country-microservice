@@ -35,7 +35,7 @@ stages:
         repository: 'country-api'
         command: 'build'
         Dockerfile: '**/Dockerfile'
-        arguments: '--build-arg nuget_pat=$(NugetPat)'
+        arguments: '--build-arg ACCESS_TOKEN=$(ACCESS_TOKEN) --build-arg ARTIFACTS_ENDPOINT=$(ARTIFACTS_ENDPOINT)'
     - task: Docker@2
       inputs:
         containerRegistry: 'seoreborn'
