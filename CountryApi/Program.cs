@@ -21,6 +21,7 @@ namespace CountryApi
                 .AddJsonFile(
                     $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json",
                     true)
+                .AddEnvironmentVariables()
                 .Build();
 
             using (SentrySdk.Init(configuration.GetSection("ThirdParty").GetSection("Sentry")["ConnectionUrl"]))
