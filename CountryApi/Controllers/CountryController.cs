@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using CountryApplication.Dtos.Request;
 using CountryApplication.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CountryApi.Controllers
@@ -19,6 +20,7 @@ namespace CountryApi.Controllers
         }
 
         [HttpGet]
+        [Authorize("country:read_all")]
         public async Task<IActionResult> Get()
         {
             var result = await _countryService.RetrieveAsync();
@@ -31,6 +33,7 @@ namespace CountryApi.Controllers
         }
 
         [HttpGet("{countryUuid}")]
+        [Authorize("country:read")]
         public async Task<IActionResult> Get(Guid countryUuid)
         {
             var result = await _countryService.RetrieveByUuidAsync(countryUuid);
@@ -43,6 +46,7 @@ namespace CountryApi.Controllers
         }
 
         [HttpPost]
+        [Authorize("country:create")]
         public async Task<IActionResult> Create([FromForm] string name, [FromForm] string code)
         {
             var result = await _countryService.CreateAsync(new CreateCountryDto(name, code));
@@ -62,6 +66,7 @@ namespace CountryApi.Controllers
         }
 
         [HttpDelete("{countryUuid}")]
+        [Authorize("country:delete")]
         public async Task<IActionResult> Delete(Guid countryUuid)
         {
             var result = await _countryService.DeleteAsync(new DeleteCountryDto(countryUuid));

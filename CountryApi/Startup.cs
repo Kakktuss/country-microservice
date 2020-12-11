@@ -5,6 +5,7 @@ using Autofac;
 using BuildingBlock.Bus.Stan;
 using CountryApplication;
 using CountryApplication.EntityFrameworkDataAccess;
+using LicenseApi.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -77,6 +78,17 @@ namespace CountryApi
                 options.Authority = Configuration.GetSection("ThirdParty").GetSection("Auth0")["TenantName"];
                 options.Audience = Configuration.GetSection("ThirdParty").GetSection("Auth0")["Audience"];
                 options.RequireHttpsMetadata = false;
+            });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("country:read_all", builder => builder.RequirePermission("country:read_all"));
+
+                options.AddPolicy("country:read", builder => builder.RequirePermission("country:read"));
+                
+                options.AddPolicy("country:create", builder => builder.RequirePermission("country:create"));
+
+                options.AddPolicy("country:delete", builder => builder.RequirePermission("country:delete"));
             });
 
             services.AddSwaggerGen(c =>
