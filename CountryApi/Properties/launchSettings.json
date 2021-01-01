@@ -2,8 +2,8 @@
   "profiles": {
     "CountryApi": {
       "commandName": "Project",
-      "launchBrowser": true,
       "applicationUrl": "http://localhost:4999",
+      "commandLineArgs": "-r win10-x64",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

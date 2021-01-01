@@ -19,17 +19,17 @@ namespace CountryApplication.EntityFrameworkDataAccess.Configurations
 
             // Setup the index UIX_Countries_Uuid on the Uuid
             builder.HasIndex(e => e.Uuid)
-                .HasName("UIX_Countries_Uuid")
+                .HasDatabaseName("UIX_Countries_Uuid")
                 .IsUnique();
 
             // Setup the index UIX_Countries_Name on the Name
             builder.HasIndex(e => e.Name)
-                .HasName("UIX_Countries_Name")
+                .HasDatabaseName("UIX_Countries_Name")
                 .IsUnique();
 
             // Setup the index UIX_Countries_Code on the Uuid
             builder.HasIndex(e => e.Code)
-                .HasName("UIX_Countries_Code")
+                .HasDatabaseName("UIX_Countries_Code")
                 .IsUnique();
         }
     }
