@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
         <RootNamespace>CountryApi</RootNamespace>
         <PublishSingleFile>true</PublishSingleFile>
         <PublishTrimmed>true</PublishTrimmed>
