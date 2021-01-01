@@ -20,7 +20,7 @@ RUN dotnet restore -s ${ARTIFACTS_ENDPOINT} -s "https://api.nuget.org/v3/index.j
 
 FROM build AS publish
 RUN ls
-RUN dotnet publish ./CountryApi/CountryApi.csproj --no-restore -c Release -o /app
+RUN dotnet publish ./CountryApi/CountryApi.csproj --no-restore -c Release -o /app -r linux-x64
 
 FROM base as final
 WORKDIR /app
