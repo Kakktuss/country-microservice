@@ -25,4 +25,5 @@ RUN dotnet publish ./CountryApi/CountryApi.csproj --no-restore -c Release -o /ap
 FROM base as final
 WORKDIR /app
 COPY --from=publish /app .
-ENTRYPOINT ["dotnet", "CountryApi.dll"]
+RUN ls
+ENTRYPOINT ["./CountryApi"]
