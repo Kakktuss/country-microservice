@@ -6,6 +6,7 @@ CountryApi/bin
 CountryApi/obj
 CountryApi/.vs
 CountryApi/CountryApi.csproj.user
+CountryApi/appsettings.Docker.json
 CountryApi/appsettings.Development.json
 
 .idea
