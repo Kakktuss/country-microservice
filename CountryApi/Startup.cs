@@ -1,16 +1,19 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using Autofac;
 using BuildingBlock.Bus.Stan;
+using CountryApi.Authorization;
+using CountryApi.HostedServices;
 using CountryApplication;
 using CountryApplication.EntityFrameworkDataAccess;
-using LicenseApi.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -142,6 +145,8 @@ namespace CountryApi
             services.AddSystemMetricCollector<NetworkCollector>();
             services.AddSystemMetricCollector<LoadAverageCollector>();
 
+            services.AddHostedService<EntityFrameworkInitializerHostedService>();
+            
             services.AddControllers();
         }
 

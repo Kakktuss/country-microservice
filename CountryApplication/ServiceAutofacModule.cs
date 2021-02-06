@@ -9,7 +9,8 @@ namespace CountryApplication
         {
             builder.RegisterType<CountryService>()
                 .As<ICountryService>()
-                .AsSelf();
+                .AsSelf()
+                .InstancePerDependency();
         }
     }
 }

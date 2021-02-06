@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 
-namespace LicenseApi.Authorization
+namespace CountryApi.Authorization
 {
     public static class ScopeAuthorizationRequirementExtensions
     {
