@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using BuildingBlock.DataAccess.Abstractions;
 using CountryApplication.Models;
@@ -16,7 +17,7 @@ namespace CountryApplication.EntityFrameworkDataAccess.Repositories
         {
             _context = context;
 
-            _countries = context.Set<Country>();
+            _countries = context.Countries;
         }
 
         public IUnitOfWork UnitOfWork => _context;
@@ -31,10 +32,7 @@ namespace CountryApplication.EntityFrameworkDataAccess.Repositories
             _countries.Remove(country);
         }
 
-        public Task<Country> FindByIdAsync(int id)
-        {
-            return _countries.FirstOrDefaultAsync(e => e.Id == id);
-        }
+        public IQueryable<Country> GetCountries() => _countries;
 
         public Task<Country> FindByUuidAsync(Guid uuid)
         {

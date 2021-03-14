@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using BuildingBlock.DataAccess.Abstractions;
 using CountryApplication.Models;
@@ -11,7 +12,7 @@ namespace CountryApplication.EntityFrameworkDataAccess.Repositories
 
         void Remove(Country country);
 
-        Task<Country> FindByIdAsync(int id);
+        IQueryable<Country> GetCountries();
 
         Task<Country> FindByUuidAsync(Guid uuid);
 

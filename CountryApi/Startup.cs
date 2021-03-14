@@ -5,9 +5,13 @@ using System.Threading.Tasks;
 using Autofac;
 using BuildingBlock.Bus.Stan;
 using CountryApi.Authorization;
+using CountryApi.GraphObject.Mutations;
+using CountryApi.GraphObject.Queries;
+using CountryApi.GraphObject.Types;
 using CountryApi.HostedServices;
 using CountryApplication;
 using CountryApplication.EntityFrameworkDataAccess;
+using HotChocolate.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -57,7 +61,7 @@ namespace CountryApi
 
             services.AddEntityFrameworkSqlServer();
 
-            services.AddDbContext<CountryContext>((serviceProvider, optionsBuilder) =>
+            services.AddDbContextPool<CountryContext>((serviceProvider, optionsBuilder) =>
             {
                 optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"),
                     sqlOptions =>
@@ -67,8 +71,6 @@ namespace CountryApi
                             TimeSpan.FromSeconds(30),
                             null);
                     });
-
-                optionsBuilder.UseInternalServiceProvider(serviceProvider);
             });
 
             services.AddAuthentication(options =>
@@ -147,7 +149,22 @@ namespace CountryApi
 
             services.AddHostedService<EntityFrameworkInitializerHostedService>();
             
+            // Add both REST & Graphql controllers
             services.AddControllers();
+
+            services.AddGraphQLServer()
+                .AddType<LocaleObjectType>()
+                .AddType<CountryObjectType>()
+                .AddType<CountryLocaleObjectType>()
+                .AddQueryType(e => e.Name("Queries"))
+                    .AddTypeExtension<LocaleQueries>()
+                    .AddTypeExtension<CountryQueries>()
+                .AddMutationType(e => e.Name("Mutations"))
+                    .AddTypeExtension<LocaleMutations>()
+                    .AddTypeExtension<CountryMutations>()
+                    .AddTypeExtension<CountryLocaleMutations>()
+                .AddProjections()
+                .AddFiltering();
         }
 
         public virtual void ConfigureMetrics(IApplicationBuilder app)
@@ -255,7 +272,18 @@ namespace CountryApi
             // Configure endpoints
             app.UseEndpoints(endpoints =>
             {
+                // Map both graphql & rest endpoints
                 endpoints.MapControllers();
+
+                endpoints.MapGraphQL()
+                    .WithOptions(new GraphQLServerOptions
+                {
+                    Tool =
+                    {
+                        Enable = true
+                    }
+                });
+                
                 endpoints.MapMetrics();
             });
         }

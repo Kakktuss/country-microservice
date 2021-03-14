@@ -20,6 +20,10 @@ namespace CountryApplication
                 .As<ICountryRepository>()
                 .AsSelf();
 
+            builder.RegisterType<LocaleRepository>()
+                .As<ILocaleRepository>()
+                .AsSelf();
+            
             // Dapper Configuration
             builder.Register(c => new DapperDataAccess.Repositories.CountryRepository(_connectionString))
                 .As<DapperDataAccess.Repositories.ICountryRepository>()

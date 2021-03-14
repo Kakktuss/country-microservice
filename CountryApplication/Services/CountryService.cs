@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using BuildingBlock.Bus.Abstractions.Stan.Events;
 using CountryApplication.Dtos.Request;
+using CountryApplication.Dtos.Request.Country;
 using CountryApplication.EntityFrameworkDataAccess.Repositories;
 using CountryApplication.IntegrationEvents.Events;
+using CountryApplication.IntegrationEvents.Events.Country;
 using CountryApplication.Models;
 using CountryApplication.ViewModels;
 using FluentResults;
@@ -69,7 +71,7 @@ namespace CountryApplication.Services
             return Result.Ok(country);
         }
 
-        public async Task<Result> CreateAsync(CreateCountryDto createCountryDto)
+        public async Task<Result<Country>> CreateAsync(CreateCountryDto createCountryDto)
         {
             _logger.LogTrace("[CountryService:CreateAsync] Starting processing the command");
 
@@ -111,18 +113,18 @@ namespace CountryApplication.Services
             _stanIntegrationEventBus.Publish(subject, "created",
                 new CountryCreatedIntegrationEvent(country.Uuid, country.Name, country.Code));
 
-            return Result.Ok();
+            return Result.Ok(country);
         }
 
-        public async Task<Result> DeleteAsync(DeleteCountryDto deleteCountryDto)
+        public async Task<Result<Country>> RemoveAsync(RemoveCountryDto removeCountryDto)
         {
             _logger.LogTrace("[CountryService:RemoveAsync] Starting processing the command");
 
-            if (!await _countryRepository.ExistsByUuidAsync(deleteCountryDto.Uuid))
-                return Result.Fail(new Error($"The country with uuid {deleteCountryDto.Uuid} does not exists")
+            if (!await _countryRepository.ExistsByUuidAsync(removeCountryDto.Uuid))
+                return Result.Fail(new Error($"The country with uuid {removeCountryDto.Uuid} does not exists")
                     .WithMetadata("errCode", "errCountryNotFound"));
 
-            var country = await _countryRepository.FindByUuidAsync(deleteCountryDto.Uuid);
+            var country = await _countryRepository.FindByUuidAsync(removeCountryDto.Uuid);
 
             if (country == null)
                 return Result.Fail(new Error(""));
@@ -155,7 +157,7 @@ namespace CountryApplication.Services
 
             _stanIntegrationEventBus.Publish(subject, "deleted", new CountryDeletedIntegrationEvent(country.Uuid));
 
-            return Result.Ok();
+            return Result.Ok(country);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CountryApplication.Dtos.Request;
+using CountryApplication.Dtos.Request.Country;
 using CountryApplication.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -69,7 +70,7 @@ namespace CountryApi.Controllers
         [Authorize("country:delete")]
         public async Task<IActionResult> Delete(Guid countryUuid)
         {
-            var result = await _countryService.DeleteAsync(new DeleteCountryDto(countryUuid));
+            var result = await _countryService.RemoveAsync(new RemoveCountryDto(countryUuid));
 
             if (result.IsFailed &&
                 result.Errors.Exists(e => e.HasMetadata("errCode", e => (string) e == "errCountryNotFound")))

@@ -16,6 +16,10 @@ namespace CountryApplication.EntityFrameworkDataAccess
 
         public DbSet<Country> Countries { get; set; }
 
+        public DbSet<Locale> Locales { get; set; }
+        
+        public DbSet<CountryLocale> CountryLocales { get; set; }
+
         public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = new())
         {
             var result = await SaveChangesAsync(cancellationToken);
@@ -25,9 +29,11 @@ namespace CountryApplication.EntityFrameworkDataAccess
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
+            modelBuilder.ApplyConfiguration(new LocaleEntityTypeConfiguration());
+            
             modelBuilder.ApplyConfiguration(new CountryEntityTypeConfiguration());
+            
+            modelBuilder.ApplyConfiguration(new CountryLocaleEntityTypeConfiguration());
         }
     }
 }
