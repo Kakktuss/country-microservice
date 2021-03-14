@@ -39,6 +39,6 @@ stages:
         arguments: '--build-arg ACCESS_TOKEN=$(ACCESS_TOKEN) --build-arg ARTIFACTS_ENDPOINT=$(ARTIFACTS_ENDPOINT)'
     - task: Docker@2
       inputs:
-        containerRegistry: 'ecomlab'
+        containerRegistry: 'EcomLab'
         repository: 'country-api'
         command: 'push'
