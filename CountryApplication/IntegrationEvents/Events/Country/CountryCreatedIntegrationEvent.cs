@@ -1,7 +1,7 @@
 ﻿using System;
 using BuildingBlock.Bus.Events;
 
-namespace CountryApplication.IntegrationEvents.Events
+namespace CountryApplication.IntegrationEvents.Events.Country
 {
     public class CountryCreatedIntegrationEvent : IntegrationEvent
     {

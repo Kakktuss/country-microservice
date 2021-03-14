@@ -1,4 +1,4 @@
-﻿namespace CountryApplication.Dtos.Request
+﻿namespace CountryApplication.Dtos.Request.Country
 {
     public class CreateCountryDto
     {

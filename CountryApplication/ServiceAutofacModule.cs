@@ -11,6 +11,16 @@ namespace CountryApplication
                 .As<ICountryService>()
                 .AsSelf()
                 .InstancePerDependency();
+
+            builder.RegisterType<LocaleService>()
+                .As<ILocaleService>()
+                .AsSelf()
+                .InstancePerDependency();
+
+            builder.RegisterType<CountryLocaleService>()
+                .As<ICountryLocaleService>()
+                .AsSelf()
+                .InstancePerDependency();
         }
     }
 }

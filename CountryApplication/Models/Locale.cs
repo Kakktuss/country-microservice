@@ -5,31 +5,28 @@ using BuildingBlock.DataAccess.Abstractions;
 
 namespace CountryApplication.Models
 {
-    public class Country : Entity, IAggregateRoot
+    public class Locale : Entity, IAggregateRoot
     {
-        protected Country()
+
+        protected Locale()
         {
             
         }
-        
-        public Country(string name,
-            string code)
+
+        public Locale(string name)
         {
             Uuid = Guid.NewGuid();
 
             Name = name;
-
-            Code = code;
-
-            Locales = new List<CountryLocale>();
+            
+            Countries = new List<CountryLocale>();
         }
-
-        public Guid Uuid { get; }
-
-        public string Name { get; }
-
-        public string Code { get; }
         
-        public List<CountryLocale> Locales { get; }
+        public Guid Uuid { get; }
+        
+        public string Name { get; }
+        
+        public List<CountryLocale> Countries { get; }
+        
     }
 }
