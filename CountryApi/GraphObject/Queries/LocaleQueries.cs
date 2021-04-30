@@ -18,18 +18,18 @@ namespace CountryApi.GraphObject.Queries
     {
 
         [GraphQLName("locales")]
-        // Authorize for admins
+        [GraphQLType(typeof(ListType<LocaleObjectType>))]
         public IQueryable<Locale> GetLocales([Service] ILocaleRepository localeRepository)
         {
-            return localeRepository.GetLocales().AsNoTracking();
+            return localeRepository.GetLocales()
+                .AsNoTracking();
         }
 
         [GraphQLName("locale")]
+        [GraphQLType(typeof(LocaleObjectType))]
         public Task<Locale> GetLocaleByUuid(Guid uuid, [Service] ILocaleRepository localeRepository)
         {
-
             return localeRepository.FindByUuidAsync(uuid);
-
         }
 
     }

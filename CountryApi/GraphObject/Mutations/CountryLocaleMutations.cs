@@ -1,9 +1,11 @@
 ﻿using System.Threading.Tasks;
+using CountryApi.GraphObject.InputTypes.Country.Locale;
 using CountryApplication.Dtos.Request.Country;
 using CountryApplication.Models;
 using CountryApplication.Services;
 using FluentResults;
 using HotChocolate;
+using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
 
 namespace CountryApi.GraphObject.Mutations
@@ -12,16 +14,18 @@ namespace CountryApi.GraphObject.Mutations
     public class CountryLocaleMutations
     {
 
-        [GraphQLName("assignLocale")]
-        public async Task<Country> AssignLocale(AssignLocaleDto input, [Service] ICountryLocaleService countryLocaleService)
+        [GraphQLName("assignCountryLocale")]
+        [Authorize(Policy = "country:locale:assign")]
+        public async Task<Country> AssignCountryLocale([GraphQLType(typeof(AssignCountryLocaleInputType))] AssignCountryLocaleDto input, [Service] ICountryLocaleService countryLocaleService)
         {
             var country = await countryLocaleService.AssignLocale(input);
 
             return country.ValueOrDefault;
         }
         
-        [GraphQLName("deassignLocale")]
-        public async Task<Country> DeassignLocale(DeassignLocaleDto input, [Service] ICountryLocaleService countryLocaleService)
+        [GraphQLName("unassignCountryLocale")]
+        [Authorize(Policy = "country:locale:unassign")]
+        public async Task<Country> UnassignLocale([GraphQLType(typeof(UnassignCountryLocaleInputType))]UnassignCountryLocaleDto input, [Service] ICountryLocaleService countryLocaleService)
         {
             var country = await countryLocaleService.DeassignLocale(input);
 

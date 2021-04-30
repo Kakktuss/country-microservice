@@ -3,8 +3,11 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
+using Autofac.Core.Lifetime;
 using BuildingBlock.Bus.Stan;
 using CountryApi.Authorization;
+using CountryApi.GraphObject.InputTypes.Country;
+using CountryApi.GraphObject.InputTypes.Country.Locale;
 using CountryApi.GraphObject.Mutations;
 using CountryApi.GraphObject.Queries;
 using CountryApi.GraphObject.Types;
@@ -12,6 +15,8 @@ using CountryApi.HostedServices;
 using CountryApplication;
 using CountryApplication.EntityFrameworkDataAccess;
 using HotChocolate.AspNetCore;
+using HotChocolate.Types.Descriptors;
+using MarketingApi.GraphObject.TypeInspectors;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -61,7 +66,8 @@ namespace CountryApi
 
             services.AddEntityFrameworkSqlServer();
 
-            services.AddDbContextPool<CountryContext>((serviceProvider, optionsBuilder) =>
+            // TODO: Fix this db context life time transient with june HC release
+            services.AddDbContext<CountryContext>((serviceProvider, optionsBuilder) =>
             {
                 optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"),
                     sqlOptions =>
@@ -71,7 +77,7 @@ namespace CountryApi
                             TimeSpan.FromSeconds(30),
                             null);
                     });
-            });
+            }, ServiceLifetime.Transient);
 
             services.AddAuthentication(options =>
             {
@@ -87,13 +93,21 @@ namespace CountryApi
 
             services.AddAuthorization(options =>
             {
+                options.AddPolicy("country:read", builder => builder.RequirePermission("country:read"));
+             
                 options.AddPolicy("country:read_all", builder => builder.RequirePermission("country:read_all"));
 
-                options.AddPolicy("country:read", builder => builder.RequirePermission("country:read"));
-                
                 options.AddPolicy("country:create", builder => builder.RequirePermission("country:create"));
 
                 options.AddPolicy("country:delete", builder => builder.RequirePermission("country:delete"));
+                
+                options.AddPolicy("locale:create", builder => builder.RequirePermission("locale:create"));
+                
+                options.AddPolicy("locale:remove", builder => builder.RequirePermission("locale:remove"));
+                
+                options.AddPolicy("country:locale:assign", builder => builder.RequirePermission("country:locale:assign"));
+                
+                options.AddPolicy("country:locale:unassign", builder => builder.RequirePermission("country:locale:unassign"));
             });
 
             services.AddSwaggerGen(c =>
@@ -153,9 +167,6 @@ namespace CountryApi
             services.AddControllers();
 
             services.AddGraphQLServer()
-                .AddType<LocaleObjectType>()
-                .AddType<CountryObjectType>()
-                .AddType<CountryLocaleObjectType>()
                 .AddQueryType(e => e.Name("Queries"))
                     .AddTypeExtension<LocaleQueries>()
                     .AddTypeExtension<CountryQueries>()
@@ -163,7 +174,20 @@ namespace CountryApi
                     .AddTypeExtension<LocaleMutations>()
                     .AddTypeExtension<CountryMutations>()
                     .AddTypeExtension<CountryLocaleMutations>()
-                .AddProjections()
+                // Locale object types
+                .AddType<LocaleObjectType>()
+                    // Locale input types
+                    .AddType<CreateLocaleInputType>()
+                    .AddType<RemoveLocaleInputType>()
+                // Country object types
+                .AddType<CountryObjectType>()
+                .AddType<CountryLocaleObjectType>()
+                    // Country input types
+                    .AddType<CreateCountryInputType>()
+                    .AddType<RemoveCountryInputType>()
+                    .AddType<AssignCountryLocaleInputType>()
+                    .AddType<UnassignCountryLocaleInputType>()
+                .AddConvention<ITypeInspector, IgnoreTypeInspector>()
                 .AddFiltering();
         }
 

@@ -15,19 +15,20 @@ namespace CountryApi.GraphObject.Queries
     public class CountryQueries
     {
         [GraphQLName("countries")]
+        [GraphQLType(typeof(ListType<CountryObjectType>))]
         // Authorize for admins
         public IQueryable<Country> GetCountries([Service] ICountryRepository countryRepository)
         {
-            return countryRepository.GetCountries().AsNoTracking();
+            return countryRepository.GetCountries()
+                .AsNoTracking();
         }
 
         [GraphQLName("country")]
         [GraphQLType(typeof(CountryObjectType))]
         public Task<Country> GetCountryByUuid(Guid uuid, [Service] ICountryRepository countryRepository)
         {
-
-            return countryRepository.FindByUuidAsync(uuid);
-
+            return countryRepository
+                .FindByUuidAsync(uuid);
         }
     }
 }

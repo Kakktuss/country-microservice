@@ -9,15 +9,13 @@ namespace CountryApi.GraphObject.Types
         {
             descriptor.BindFieldsImplicitly();
 
-            descriptor.Field(e => e.Uuid)
-                .Type<UuidType>();
-
+                        
+            descriptor.Ignore(e => e.Id);
+            
             // Ignore local country id & local locale id
             descriptor.Ignore(e => e.DomainEvents);
 
             descriptor.Ignore(e => e.IsTransient());
-            
-            descriptor.Ignore(e => e.Id);
         }
     }
 }
