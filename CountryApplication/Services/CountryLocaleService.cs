@@ -21,12 +21,12 @@ namespace CountryApplication.Services
             _localeRepository = localeRepository;
         }
         
-        public Task<Result<Country>> AssignLocale(AssignLocaleDto assignLocaleDto)
+        public Task<Result<Country>> AssignLocale(AssignCountryLocaleDto assignCountryLocaleDto)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<Result<Country>> DeassignLocale(DeassignLocaleDto deassignLocaleDto)
+        public Task<Result<Country>> DeassignLocale(UnassignCountryLocaleDto unassignCountryLocaleDto)
         {
             throw new System.NotImplementedException();
         }

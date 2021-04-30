@@ -2,7 +2,7 @@
 
 namespace CountryApplication.Dtos.Request.Country
 {
-    public class AssignLocaleDto
+    public class AssignCountryLocaleDto
     {
         public Guid CountryUuid { get; set; }
         

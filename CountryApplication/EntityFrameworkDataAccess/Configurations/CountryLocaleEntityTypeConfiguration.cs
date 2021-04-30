@@ -1,5 +1,6 @@
 ﻿using CountryApplication.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CountryApplication.EntityFrameworkDataAccess.Configurations
@@ -10,7 +11,11 @@ namespace CountryApplication.EntityFrameworkDataAccess.Configurations
         {
             builder.ToTable("CountryLocales");
 
-            builder.HasKey(e => new {e.CountryId, e.LocaleId});
+            // Tell efcore to delegate the generation of the id to the database
+            builder.Property(e => e.Id)
+                .UseIdentityColumn()
+                .Metadata
+                .SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
             
             builder.HasOne(e => e.Country)
                 .WithMany(e => e.Locales)

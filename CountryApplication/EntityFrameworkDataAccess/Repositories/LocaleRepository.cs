@@ -32,7 +32,12 @@ namespace CountryApplication.EntityFrameworkDataAccess.Repositories
             _locales.Remove(locale);
         }
 
-        public IQueryable<Locale> GetLocales() => _locales;
+        public IQueryable<Locale> GetLocales()
+        {
+            return _locales
+                .Include(e => e.Countries)
+                    .ThenInclude(e => e.Country);
+        }
 
         public Task<Locale> FindByUuidAsync(Guid uuid)
         {

@@ -2,7 +2,7 @@
 
 namespace CountryApplication.Dtos.Request.Country
 {
-    public class DeassignLocaleDto
+    public class UnassignCountryLocaleDto
     {
         public Guid CountryUuid { get; set; }
         

@@ -32,11 +32,16 @@ namespace CountryApplication.EntityFrameworkDataAccess.Repositories
             _countries.Remove(country);
         }
 
-        public IQueryable<Country> GetCountries() => _countries;
+        public IQueryable<Country> GetCountries()
+        {
+            return _countries
+                .Include(e => e.Locales)
+                .ThenInclude(e => e.Locale);
+        }
 
         public Task<Country> FindByUuidAsync(Guid uuid)
         {
-            return _countries.FirstOrDefaultAsync(e => e.Uuid == uuid);
+            return GetCountries().FirstOrDefaultAsync(e => e.Uuid == uuid);
         }
 
         public Task<bool> ExistsByUuidAsync(Guid uuid)
